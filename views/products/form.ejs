@@ -1,0 +1,60 @@
+<div class="row justify-content-center">
+  <div class="col-lg-8">
+    <div class="card">
+      <div class="card-header bg-white border-0 py-3">
+        <h5 class="mb-0"><i class="bi bi-<%= product ? 'pencil' : 'plus-circle' %> me-2"></i><%= product ? 'Sửa sản phẩm' : 'Thêm sản phẩm mới' %></h5>
+      </div>
+      <div class="card-body">
+        <% if (error) { %>
+        <div class="alert alert-danger rounded-3"><i class="bi bi-exclamation-circle me-2"></i><%= error %></div>
+        <% } %>
+        <form method="POST" action="<%= product ? '/products/edit/' + product._id : '/products/add' %>">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label fw-medium">Tên sản phẩm <span class="text-danger">*</span></label>
+              <input type="text" name="name" class="form-control" required value="<%= product ? product.name : '' %>" placeholder="Nhập tên sản phẩm">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-medium">Mã sản phẩm <span class="text-danger">*</span></label>
+              <input type="text" name="code" class="form-control" required value="<%= product ? product.code : '' %>" placeholder="VD: SP001">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-medium">Giá nhập <span class="text-danger">*</span></label>
+              <div class="input-group">
+                <input type="number" name="cost" class="form-control" required min="0" value="<%= product ? product.cost : '' %>">
+                <span class="input-group-text">đ</span>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-medium">Giá bán <span class="text-danger">*</span></label>
+              <div class="input-group">
+                <input type="number" name="price" class="form-control" required min="0" value="<%= product ? product.price : '' %>">
+                <span class="input-group-text">đ</span>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-medium">Số lượng <span class="text-danger">*</span></label>
+              <input type="number" name="quantity" class="form-control" required min="0" value="<%= product ? product.quantity : 0 %>">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-medium">Ngưỡng cảnh báo hết hàng</label>
+              <input type="number" name="lowStockThreshold" class="form-control" min="0" value="<%= product ? product.lowStockThreshold : 10 %>">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-medium">Danh mục</label>
+              <input type="text" name="category" class="form-control" value="<%= product ? product.category : 'Khác' %>">
+            </div>
+            <div class="col-12">
+              <label class="form-label fw-medium">Mô tả</label>
+              <textarea name="description" class="form-control" rows="3" placeholder="Mô tả sản phẩm..."><%= product ? product.description : '' %></textarea>
+            </div>
+          </div>
+          <div class="d-flex gap-2 mt-4">
+            <button type="submit" class="btn btn-primary"><i class="bi bi-check-lg me-1"></i><%= product ? 'Cập nhật' : 'Thêm mới' %></button>
+            <a href="/products" class="btn btn-outline-secondary">Hủy</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

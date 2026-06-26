@@ -1,0 +1,60 @@
+<div class="card">
+  <div class="card-header bg-white border-0 d-flex justify-content-between align-items-center py-3 flex-wrap gap-2">
+    <h5 class="mb-0"><i class="bi bi-cart3 me-2"></i>Danh sách đơn hàng</h5>
+    <a href="/orders/add" class="btn btn-primary"><i class="bi bi-plus-lg me-1"></i>Tạo đơn hàng</a>
+  </div>
+  <div class="card-body">
+    <form method="GET" action="/orders" class="row g-2 mb-3">
+      <div class="col-md-4">
+        <div class="input-group">
+          <span class="input-group-text bg-light"><i class="bi bi-search"></i></span>
+          <input type="text" name="search" class="form-control" placeholder="Tìm theo mã đơn hoặc khách hàng..." value="<%= typeof search !== 'undefined' && search ? search : '' %>">
+        </div>
+      </div>
+      <div class="col-md-3">
+        <select name="status" class="form-select">
+          <option value="">Tất cả trạng thái</option>
+          <option value="pending" <%= typeof status !== 'undefined' && status === 'pending' ? 'selected' : '' %>>Chờ xử lý</option>
+          <option value="processing" <%= typeof status !== 'undefined' && status === 'processing' ? 'selected' : '' %>>Đang xử lý</option>
+          <option value="completed" <%= typeof status !== 'undefined' && status === 'completed' ? 'selected' : '' %>>Hoàn thành</option>
+          <option value="cancelled" <%= typeof status !== 'undefined' && status === 'cancelled' ? 'selected' : '' %>>Đã hủy</option>
+        </select>
+      </div>
+      <div class="col-md-2">
+        <button type="submit" class="btn btn-outline-primary w-100">Lọc</button>
+      </div>
+    </form>
+
+    <div class="table-responsive">
+      <table class="table">
+        <thead>
+          <tr><th>Mã đơn</th><th>Khách hàng</th><th>Tổng tiền</th><th>Lợi nhuận</th><th>Trạng thái</th><th>Ngày tạo</th><th>Thao tác</th></tr>
+        </thead>
+        <tbody>
+          <% if (orders && orders.length > 0) { %>
+            <% orders.forEach(order => { %>
+            <tr>
+              <td><a href="/orders/detail/<%= order._id %>" class="fw-medium"><%= order.orderCode %></a></td>
+              <td><%= order.customerName %></td>
+              <td><%= order.totalAmount.toLocaleString('vi-VN') %>đ</td>
+              <td><%= order.profit.toLocaleString('vi-VN') %>đ</td>
+              <td>
+                <% if (order.status === 'pending') { %><span class="badge bg-warning">Chờ xử lý</span><% } %>
+                <% if (order.status === 'processing') { %><span class="badge bg-info">Đang xử lý</span><% } %>
+                <% if (order.status === 'completed') { %><span class="badge bg-success">Hoàn thành</span><% } %>
+                <% if (order.status === 'cancelled') { %><span class="badge bg-danger">Đã hủy</span><% } %>
+              </td>
+              <td><%= order.createdAt.toLocaleDateString('vi-VN') %></td>
+              <td>
+                <a href="/orders/detail/<%= order._id %>" class="btn btn-sm btn-outline-primary"><i class="bi bi-eye"></i></a>
+              </td>
+            </tr>
+            <% }) %>
+          <% } else { %>
+            <tr><td colspan="7" class="text-center text-muted py-5">Không tìm thấy đơn hàng nào</td></tr>
+          <% } %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

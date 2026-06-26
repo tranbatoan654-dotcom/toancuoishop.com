@@ -1,0 +1,54 @@
+<div class="card">
+  <div class="card-header bg-white border-0 d-flex justify-content-between align-items-center py-3">
+    <h5 class="mb-0"><i class="bi bi-people me-2"></i>Quản lý người dùng</h5>
+  </div>
+  <div class="card-body">
+    <div class="table-responsive">
+      <table class="table">
+        <thead>
+          <tr><th>Tên đăng nhập</th><th>Họ tên</th><th>Email</th><th>SĐT</th><th>Ngày hết hạn</th><th>Trạng thái</th><th>Thao tác</th></tr>
+        </thead>
+        <tbody>
+          <% if (users && users.length > 0) { %>
+            <% users.forEach(u => { %>
+            <tr>
+              <td><%= u.username %></td>
+              <td><%= u.fullName || '-' %></td>
+              <td><%= u.email || '-' %></td>
+              <td><%= u.phone || '-' %></td>
+              <td>
+                <% const now = new Date(); const isExpired = u.expiryDate < now; %>
+                <span class="badge <%= isExpired ? 'bg-danger' : 'bg-success' %>"><%= u.expiryDate.toLocaleDateString('vi-VN') %></span>
+              </td>
+              <td>
+                <% if (u.isLocked) { %><span class="badge bg-danger">Đã khóa</span><% } else { %><span class="badge bg-success">Hoạt động</span><% } %>
+              </td>
+              <td>
+                <form method="POST" action="/admin/users/lock/<%= u._id %>" class="d-inline">
+                  <button type="submit" class="btn btn-sm <%= u.isLocked ? 'btn-outline-success' : 'btn-outline-danger' %>">
+                    <i class="bi bi-<%= u.isLocked ? 'unlock' : 'lock' %>"></i> <%= u.isLocked ? 'Mở khóa' : 'Khóa' %>
+                  </button>
+                </form>
+                <form method="POST" action="/admin/users/renew/<%= u._id %>" class="d-inline" onsubmit="return confirm('Gia hạn tài khoản <%= u.username %> thêm tháng?')">
+                  <input type="hidden" name="months" value="1">
+                  <button type="submit" class="btn btn-sm btn-outline-primary">
+                    <i class="bi bi-calendar-plus"></i> +1 tháng
+                  </button>
+                </form>
+                <form method="POST" action="/admin/users/renew/<%= u._id %>" class="d-inline" onsubmit="return confirm('Gia hạn tài khoản <%= u.username %> thêm 3 tháng?')">
+                  <input type="hidden" name="months" value="3">
+                  <button type="submit" class="btn btn-sm btn-outline-success">
+                    <i class="bi bi-calendar-plus"></i> +3 tháng
+                  </button>
+                </form>
+              </td>
+            </tr>
+            <% }) %>
+          <% } else { %>
+            <tr><td colspan="7" class="text-center text-muted py-5">Chưa có người dùng nào</td></tr>
+          <% } %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

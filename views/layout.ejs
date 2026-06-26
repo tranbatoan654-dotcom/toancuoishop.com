@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= typeof title !== 'undefined' && title ? title : 'Quản lý kho hàng' %></title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+  <style>
+    :root { --sidebar-width: 260px; --primary: #2c3e50; --accent: #3498db; --success: #27ae60; --warning: #f39c12; --danger: #e74c3c; }
+    body { font-family: 'Segoe UI', sans-serif; background: #f5f7fa; }
+    .sidebar { position: fixed; top: 0; left: 0; width: var(--sidebar-width); height: 100vh; background: linear-gradient(180deg, var(--primary) 0%, #1a252f 100%); color: #fff; padding-top: 1rem; z-index: 1000; transition: transform .3s; }
+    .sidebar-brand { padding: 0 1.5rem 1.5rem; border-bottom: 1px solid rgba(255,255,255,.1); font-size: 1.2rem; font-weight: 700; }
+    .sidebar-nav { list-style: none; padding: 0; margin-top: 1rem; }
+    .sidebar-nav li a { display: flex; align-items: center; gap: .75rem; padding: .75rem 1.5rem; color: rgba(255,255,255,.8); text-decoration: none; transition: all .2s; }
+    .sidebar-nav li a:hover, .sidebar-nav li a.active { background: rgba(255,255,255,.1); color: #fff; border-left: 3px solid var(--accent); }
+    .sidebar-nav li a i { font-size: 1.1rem; }
+    .main-content { margin-left: var(--sidebar-width); padding: 1.5rem; min-height: 100vh; }
+    .topbar { background: #fff; border-radius: 12px; padding: 1rem 1.5rem; display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; box-shadow: 0 2px 8px rgba(0,0,0,.04); }
+    .card { border: none; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,.04); transition: transform .2s; }
+    .card:hover { transform: translateY(-2px); }
+    .stat-card { padding: 1.5rem; }
+    .stat-icon { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; }
+    .table { margin-bottom: 0; }
+    .table thead th { background: #f8f9fa; font-weight: 600; font-size: .85rem; text-transform: uppercase; letter-spacing: .3px; border: none; }
+    .btn { border-radius: 8px; }
+    .btn-primary { background: var(--accent); border-color: var(--accent); }
+    .btn-success { background: var(--success); border-color: var(--success); }
+    .badge { border-radius: 6px; font-weight: 500; padding: .5em .75em; }
+    .mobile-toggle { display: none; background: none; border: none; color: var(--primary); font-size: 1.5rem; }
+    @media (max-width: 768px) { .sidebar { transform: translateX(-100%); } .sidebar.open { transform: translateX(0); } .main-content { margin-left: 0; } .mobile-toggle { display: block; } }
+    .renewal-banner { background: linear-gradient(135deg, #f39c12, #e67e22); color: #fff; border-radius: 12px; padding: 1rem 1.5rem; margin-bottom: 1.5rem; }
+    .qr-code { max-width: 280px; border-radius: 12px; box-shadow: 0 4px 16px rgba(0,0,0,.1); }
+  </style>
+</head>
+<body>
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand"><i class="bi bi-box-seam me-2"></i>Quản lý Kho</div>
+    <ul class="sidebar-nav">
+      <li><a href="/" class="<%= typeof currentPath !== 'undefined' && currentPath === '/' ? 'active' : '' %>"><i class="bi bi-house-door"></i> Trang chủ</a></li>
+      <li><a href="/products" class="<%= typeof currentPath !== 'undefined' && currentPath === '/products' ? 'active' : '' %>"><i class="bi bi-box"></i> Sản phẩm</a></li>
+      <li><a href="/orders" class="<%= typeof currentPath !== 'undefined' && currentPath === '/orders' ? 'active' : '' %>"><i class="bi bi-cart3"></i> Đơn hàng</a></li>
+      <% if (typeof userRole !== 'undefined' && userRole === 'admin') { %>
+      <li><a href="/admin" class="<%= typeof currentPath !== 'undefined' && currentPath === '/admin' ? 'active' : '' %>"><i class="bi bi-speedometer2"></i> Dashboard</a></li>
+      <li><a href="/admin/users" class="<%= typeof currentPath !== 'undefined' && currentPath === '/admin/users' ? 'active' : '' %>"><i class="bi bi-people"></i> Người dùng</a></li>
+      <li><a href="/admin/transactions" class="<%= typeof currentPath !== 'undefined' && currentPath === '/admin/transactions' ? 'active' : '' %>"><i class="bi bi-cash-stack"></i> Giao dịch</a></li>
+      <% } %>
+      <li><a href="/renewal" class="<%= typeof currentPath !== 'undefined' && currentPath === '/renewal' ? 'active' : '' %>"><i class="bi bi-credit-card"></i> Gia hạn</a></li>
+      <li><a href="/logout"><i class="bi bi-box-arrow-right"></i> Đăng xuất</a></li>
+    </ul>
+  </aside>
+
+  <main class="main-content">
+    <div class="topbar">
+      <button class="mobile-toggle" onclick="document.getElementById('sidebar').classList.toggle('open')"><i class="bi bi-list"></i></button>
+      <div>
+        <span class="text-muted">Xin chào,</span>
+        <strong class="ms-1"><%= typeof fullName !== 'undefined' && fullName ? fullName : 'Người dùng' %></strong>
+        <% if (typeof userRole !== 'undefined' && userRole === 'admin') { %><span class="badge bg-danger ms-2">Admin</span><% } %>
+      </div>
+      <% if (typeof userRole !== 'undefined' && userRole !== 'admin' && typeof daysLeft !== 'undefined' && daysLeft !== null) { %>
+      <div>
+        <% if (daysLeft <= 7) { %>
+        <span class="badge bg-danger">Còn <%= daysLeft %> ngày</span>
+        <% } else { %>
+        <span class="badge bg-success">Còn <%= daysLeft %> ngày</span>
+        <% } %>
+      </div>
+      <% } %>
+    </div>
+    <%- body %>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,107 @@
+<div class="row g-4">
+  <div class="col-md-3 col-sm-6">
+    <div class="card stat-card">
+      <div class="d-flex align-items-center justify-content-between">
+        <div>
+          <div class="text-muted small">Tổng sản phẩm</div>
+          <h3 class="mb-0 mt-1"><%= typeof productCount !== 'undefined' && productCount ? productCount : 0 %></h3>
+        </div>
+        <div class="stat-icon bg-primary bg-opacity-10 text-primary"><i class="bi bi-box"></i></div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3 col-sm-6">
+    <div class="card stat-card">
+      <div class="d-flex align-items-center justify-content-between">
+        <div>
+          <div class="text-muted small">Tổng đơn hàng</div>
+          <h3 class="mb-0 mt-1"><%= typeof orderCount !== 'undefined' && orderCount ? orderCount : 0 %></h3>
+        </div>
+        <div class="stat-icon bg-success bg-opacity-10 text-success"><i class="bi bi-cart3"></i></div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3 col-sm-6">
+    <div class="card stat-card">
+      <div class="d-flex align-items-center justify-content-between">
+        <div>
+          <div class="text-muted small">Doanh thu</div>
+          <h3 class="mb-0 mt-1"><%= (revenue || 0).toLocaleString('vi-VN') %>đ</h3>
+        </div>
+        <div class="stat-icon bg-warning bg-opacity-10 text-warning"><i class="bi bi-currency-dollar"></i></div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3 col-sm-6">
+    <div class="card stat-card">
+      <div class="d-flex align-items-center justify-content-between">
+        <div>
+          <div class="text-muted small">Lợi nhuận</div>
+          <h3 class="mb-0 mt-1"><%= (profit || 0).toLocaleString('vi-VN') %>đ</h3>
+        </div>
+        <div class="stat-icon bg-info bg-opacity-10 text-info"><i class="bi bi-graph-up"></i></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-4 mt-2">
+  <div class="col-md-8">
+    <div class="card">
+      <div class="card-header bg-white border-0 d-flex justify-content-between align-items-center py-3">
+        <h5 class="mb-0"><i class="bi bi-cart-check me-2"></i>Đơn hàng gần đây</h5>
+        <a href="/orders" class="btn btn-sm btn-outline-primary">Xem tất cả</a>
+      </div>
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table">
+            <thead><tr><th>Mã đơn</th><th>Khách hàng</th><th>Tổng tiền</th><th>Trạng thái</th><th>Ngày</th></tr></thead>
+            <tbody>
+              <% if (recentOrders && recentOrders.length > 0) { %>
+                <% recentOrders.forEach(order => { %>
+                <tr>
+                  <td><a href="/orders/detail/<%= order._id %>"><%= order.orderCode %></a></td>
+                  <td><%= order.customerName %></td>
+                  <td><%= order.totalAmount.toLocaleString('vi-VN') %>đ</td>
+                  <td>
+                    <% if (order.status === 'pending') { %><span class="badge bg-warning">Chờ xử lý</span><% } %>
+                    <% if (order.status === 'processing') { %><span class="badge bg-info">Đang xử lý</span><% } %>
+                    <% if (order.status === 'completed') { %><span class="badge bg-success">Hoàn thành</span><% } %>
+                    <% if (order.status === 'cancelled') { %><span class="badge bg-danger">Đã hủy</span><% } %>
+                  </td>
+                  <td><%= order.createdAt.toLocaleDateString('vi-VN') %></td>
+                </tr>
+                <% }) %>
+              <% } else { %>
+                <tr><td colspan="5" class="text-center text-muted py-4">Chưa có đơn hàng nào</td></tr>
+              <% } %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card">
+      <div class="card-header bg-white border-0 py-3">
+        <h5 class="mb-0"><i class="bi bi-exclamation-triangle me-2 text-warning"></i>Sắp hết hàng</h5>
+      </div>
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table">
+            <thead><tr><th>Sản phẩm</th><th>Tồn</th></tr></thead>
+            <tbody>
+              <% if (lowStockProducts && lowStockProducts.length > 0) { %>
+                <% lowStockProducts.forEach(p => { %>
+                <tr><td><%= p.name %></td><td><span class="badge bg-danger"><%= p.quantity %></span></td></tr>
+                <% }) %>
+              <% } else { %>
+                <tr><td colspan="2" class="text-center text-muted py-4">Không có sản phẩm sắp hết hàng</td></tr>
+              <% } %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

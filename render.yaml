@@ -1,0 +1,20 @@
+services:
+  - type: web
+    name: inventory-app
+    runtime: node
+    plan: free
+    buildCommand: npm install
+    startCommand: node server.js
+    envVars:
+      - key: MONGODB_URI
+        sync: false
+      - key: SESSION_SECRET
+        generateValue: true
+      - key: PORT
+        value: 3000
+      - key: RENEWAL_FEE
+        value: 70000
+      - key: RENEWAL_DAYS
+        value: 30
+      - key: NODE_ENV
+        value: production

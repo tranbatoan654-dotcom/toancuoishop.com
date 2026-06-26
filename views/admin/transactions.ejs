@@ -1,0 +1,45 @@
+<div class="card">
+  <div class="card-header bg-white border-0 d-flex justify-content-between align-items-center py-3">
+    <h5 class="mb-0"><i class="bi bi-cash-stack me-2"></i>Quản lý giao dịch gia hạn</h5>
+  </div>
+  <div class="card-body">
+    <div class="table-responsive">
+      <table class="table">
+        <thead>
+          <tr><th>Người dùng</th><th>Số tiền</th><th>Số tháng</th><th>Trạng thái</th><th>Ngày tạo</th><th>Thao tác</th></tr>
+        </thead>
+        <tbody>
+          <% if (transactions && transactions.length > 0) { %>
+            <% transactions.forEach(t => { %>
+            <tr>
+              <td><%= t.user ? (t.user.fullName || t.user.username) : 'Unknown' %></td>
+              <td class="fw-medium"><%= t.amount.toLocaleString('vi-VN') %>đ</td>
+              <td><%= t.months %> tháng</td>
+              <td>
+                <% if (t.status === 'pending') { %><span class="badge bg-warning">Chờ duyệt</span><% } %>
+                <% if (t.status === 'approved') { %><span class="badge bg-success">Đã duyệt</span><% } %>
+                <% if (t.status === 'rejected') { %><span class="badge bg-danger">Từ chối</span><% } %>
+              </td>
+              <td><%= t.createdAt.toLocaleDateString('vi-VN') %></td>
+              <td>
+                <% if (t.status === 'pending') { %>
+                <form method="POST" action="/admin/transactions/approve/<%= t._id %>" class="d-inline">
+                  <button type="submit" class="btn btn-sm btn-success me-1"><i class="bi bi-check-lg"></i> Duyệt</button>
+                </form>
+                <form method="POST" action="/admin/transactions/reject/<%= t._id %>" class="d-inline">
+                  <button type="submit" class="btn btn-sm btn-outline-danger"><i class="bi bi-x-lg"></i> Từ chối</button>
+                </form>
+                <% } else { %>
+                <span class="text-muted small"><%= t.status === 'approved' ? 'Đã duyệt ' + (t.approvedAt ? t.approvedAt.toLocaleDateString('vi-VN') : '') : 'Đã từ chối' %></span>
+                <% } %>
+              </td>
+            </tr>
+            <% }) %>
+          <% } else { %>
+            <tr><td colspan="6" class="text-center text-muted py-5">Chưa có giao dịch nào</td></tr>
+          <% } %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

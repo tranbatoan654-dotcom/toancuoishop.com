@@ -1,0 +1,133 @@
+<div class="row justify-content-center">
+  <div class="col-lg-10">
+    <div class="card">
+      <div class="card-header bg-white border-0 py-3">
+        <h5 class="mb-0"><i class="bi bi-cart-plus me-2"></i>Tạo đơn hàng mới</h5>
+      </div>
+      <div class="card-body">
+        <% if (error) { %>
+        <div class="alert alert-danger rounded-3"><i class="bi bi-exclamation-circle me-2"></i><%= error %></div>
+        <% } %>
+        <form method="POST" action="/orders/add" id="orderForm">
+          <div class="row g-3 mb-4">
+            <div class="col-md-4">
+              <label class="form-label fw-medium">Tên khách hàng <span class="text-danger">*</span></label>
+              <input type="text" name="customerName" class="form-control" required placeholder="Nhập tên khách hàng">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label fw-medium">Số điện thoại</label>
+              <input type="text" name="customerPhone" class="form-control" placeholder="Số điện thoại">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label fw-medium">Phương thức thanh toán</label>
+              <select name="paymentMethod" class="form-select">
+                <option value="cash">Tiền mặt</option>
+                <option value="transfer">Chuyển khoản</option>
+              </select>
+            </div>
+            <div class="col-12">
+              <label class="form-label fw-medium">Địa chỉ</label>
+              <textarea name="customerAddress" class="form-control" rows="2" placeholder="Địa chỉ giao hàng"></textarea>
+            </div>
+          </div>
+
+          <h6 class="fw-medium mb-3"><i class="bi bi-box me-2"></i>Sản phẩm trong đơn</h6>
+          <div id="itemsContainer">
+            <div class="row g-2 item-row align-items-end mb-2">
+              <div class="col-md-5">
+                <label class="form-label small text-muted">Sản phẩm</label>
+                <select name="itemProduct[]" class="form-select product-select" required>
+                  <option value="">Chọn sản phẩm</option>
+                  <% products.forEach(p => { %>
+                  <option value="<%= p._id %>" data-price="<%= p.price %>" data-stock="<%= p.quantity %>"><%= p.name %> (<%= p.price.toLocaleString('vi-VN') %>đ - Còn <%= p.quantity %>)</option>
+                  <% }) %>
+                </select>
+              </div>
+              <div class="col-md-2">
+                <label class="form-label small text-muted">Số lượng</label>
+                <input type="number" name="itemQuantity[]" class="form-control quantity-input" min="1" value="1" required>
+              </div>
+              <div class="col-md-3">
+                <label class="form-label small text-muted">Thành tiền</label>
+                <input type="text" class="form-control item-total" readonly value="0đ">
+              </div>
+              <div class="col-md-2">
+                <button type="button" class="btn btn-outline-danger w-100 remove-item" disabled><i class="bi bi-trash"></i></button>
+              </div>
+            </div>
+          </div>
+          <button type="button" class="btn btn-outline-primary btn-sm mt-2" id="addItem"><i class="bi bi-plus-lg me-1"></i>Thêm sản phẩm</button>
+
+          <div class="border-top mt-4 pt-3">
+            <div class="d-flex justify-content-between align-items-center">
+              <div class="text-muted">Tổng tiền:</div>
+              <div class="h4 mb-0 text-danger" id="grandTotal">0đ</div>
+            </div>
+          </div>
+
+          <div class="mt-4">
+            <label class="form-label fw-medium">Ghi chú</label>
+            <textarea name="notes" class="form-control" rows="2" placeholder="Ghi chú đơn hàng..."></textarea>
+          </div>
+
+          <div class="d-flex gap-2 mt-4">
+            <button type="submit" class="btn btn-primary"><i class="bi bi-check-lg me-1"></i>Tạo đơn hàng</button>
+            <a href="/orders" class="btn btn-outline-secondary">Hủy</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function() {
+  const container = document.getElementById('itemsContainer');
+  const addBtn = document.getElementById('addItem');
+  const grandTotal = document.getElementById('grandTotal');
+  function updateTotals() {
+    let total = 0;
+    container.querySelectorAll('.item-row').forEach(row => {
+      const select = row.querySelector('.product-select');
+      const qty = row.querySelector('.quantity-input');
+      const totalEl = row.querySelector('.item-total');
+      const opt = select.selectedOptions[0];
+      if (opt && opt.value) {
+        const price = parseInt(opt.dataset.price) || 0;
+        const q = parseInt(qty.value) || 0;
+        const t = price * q;
+        totalEl.value = t.toLocaleString('vi-VN') + 'đ';
+        total += t;
+      }
+    });
+    grandTotal.textContent = total.toLocaleString('vi-VN') + 'đ';
+  }
+
+  function bindRow(row) {
+    row.querySelector('.product-select').addEventListener('change', updateTotals);
+    row.querySelector('.quantity-input').addEventListener('input', updateTotals);
+    row.querySelector('.remove-item').addEventListener('click', () => {
+      row.remove();
+      updateTotals();
+      const rows = container.querySelectorAll('.item-row');
+      rows.forEach((r, i) => { r.querySelector('.remove-item').disabled = rows.length === 1; });
+    });
+  }
+
+  bindRow(container.querySelector('.item-row'));
+
+  addBtn.addEventListener('click', () => {
+    const templateRow = container.querySelector('.item-row');
+    const row = templateRow.cloneNode(true);
+    const originalSelect = templateRow.querySelector('.product-select');
+    row.querySelector('.product-select').innerHTML = originalSelect.innerHTML;
+    row.querySelector('.product-select').value = '';
+    row.querySelector('.quantity-input').value = 1;
+    row.querySelector('.item-total').value = '0đ';
+    container.appendChild(row);
+    bindRow(row);
+    const rows = container.querySelectorAll('.item-row');
+    rows.forEach(r => { r.querySelector('.remove-item').disabled = rows.length === 1; });
+  });
+})();
+</script>
